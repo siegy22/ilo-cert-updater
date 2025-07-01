@@ -34,29 +34,27 @@ def update_ilo_cert(ilo_host, username, password, cert_bundle):
     r.raise_for_status()
     print(f"Updated certificate on {ilo_host}")
 
-
 def main():
-    ilo_hosts = os.environ["ILO_ADDRESSES"].split(",")
+    ilo_map = os.environ["ILO_CERT_MAP"]
     username = os.environ["ILO_USERNAME"]
     password = os.environ["ILO_PASSWORD"]
-    secret_name = os.environ["CERT_SECRET_NAME"]
     namespace = os.environ["CERT_SECRET_NAMESPACE"]
 
-    cert, key = get_secret_data(secret_name, namespace)
-    cert_bundle = cert + "\n" + key
+    config_map = dict(item.split("=", 1) for item in ilo_map.split(","))
+    config.load_incluster_config()
 
-    x509 = crypto.load_certificate(crypto.FILETYPE_PEM, cert)
-    new_serial = format(x509.get_serial_number(), 'x').upper()
-
-    for ilo in ilo_hosts:
-        ilo = ilo.strip()
+    for ilo, secret_name in config_map.items():
+        cert, key = get_secret_data(secret_name.strip(), namespace)
+        cert_bundle = cert + "\n" + key
+        x509 = crypto.load_certificate(crypto.FILETYPE_PEM, cert)
+        new_serial = format(x509.get_serial_number(), 'x').upper()
         current_serial = get_cert_serial(ilo, username, password).replace(":", "").upper()
+
         if current_serial != new_serial:
             print(f"Serial mismatch for {ilo}: {current_serial} != {new_serial}")
             update_ilo_cert(ilo, username, password, cert_bundle)
         else:
             print(f"Certificate on {ilo} is up to date.")
-
 
 if __name__ == "__main__":
     main()
