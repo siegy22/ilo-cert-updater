@@ -2,9 +2,10 @@ FROM python:alpine
 
 # Install required dependencies
 RUN pip install --no-cache-dir \
-requests \
-kubernetes \
-pyOpenSSL
+  requests \
+  kubernetes \
+  pyOpenSSL \
+  python-dateutil
 
 # Create app directory
 WORKDIR /app
