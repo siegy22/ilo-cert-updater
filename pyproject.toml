@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "ilo-cert-updater"
+version = "0.1.0"
+description = "Update HPE OneView and HPE iLO certificates based on cert-manager issued certificates"
+authors = ["Yves Siegrist <Elektron1c97@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.13"
+requests = "^2.32.4"
+kubernetes = "^33.1.0"
+pyopenssl = "^25.1.0"
+python-dateutil = "^2.9.0.post0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
